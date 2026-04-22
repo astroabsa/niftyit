@@ -7,7 +7,7 @@ import requests
 import streamlit as st
 from zoneinfo import ZoneInfo
 
-st.set_page_config(page_title="FNO Intelligence Terminal", layout="wide")
+st.set_page_config(page_title="FNO Terminal - ABSA", layout="wide")
 
 # Early injection to catch portal-rendered dropdown popup
 st.markdown("""
