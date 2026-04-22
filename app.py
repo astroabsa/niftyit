@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 import requests
 import streamlit as st
 
-st.set_page_config(page_title="FNO Intelligence Terminal", layout="wide")
+st.set_page_config(page_title="FNO Intelligence Terminal", layout="wide", initial_sidebar_state="collapsed")
 
 INDIA_VIX_QUOTE_KEY = "NSE_INDEX|India VIX"
 INDIA_VIX_DATA_KEY = "NSE_INDEX:India VIX"
@@ -78,8 +78,12 @@ st.markdown(
         box-shadow:none !important;
         color:#ffffff !important;
         min-height:48px !important;
+        height:48px !important;
     }}
 
+    .top-shell-select [data-testid="stSelectbox"] button,
+    .top-shell-select [data-testid="stSelectbox"] label,
+    .top-shell-select [data-testid="stSelectbox"] [aria-label],
     .top-shell-select input,
     .top-shell-select [data-baseweb="select"] input,
     .top-shell-select [data-baseweb="select"] div,
@@ -152,6 +156,8 @@ st.markdown(
     .trade-title {{font-size:24px; font-weight:900; color:{BLUE};}}
     .trade-note {{font-size:13px; color:#b8bec7; margin-top:6px;}}
     .small-caption {{font-size:12px; color:{MUTED}; text-align:right; margin-top:6px;}}
+    [data-testid="stSidebar"] {{display:none !important;}}
+    [data-testid="collapsedControl"] {{display:none !important;}}
     .stButton > button {{width:100%; border-radius:8px; border:none; min-height:42px; font-weight:800; background:#ff1d13; color:white;}}
     .stButton > button:hover {{background:#ff2b22; color:white;}}
     .stDataFrame {{border:1px solid {BORDER}; border-radius:8px; overflow:hidden;}}
@@ -334,7 +340,7 @@ if not ACCESS_TOKEN:
     st.error("Missing ACCESS_TOKEN in secrets.toml")
     st.stop()
 
-control_cols = st.columns([1.6, 1.6, 2.2, 1.5, 2.2, 1.4, 1.6])
+control_cols = st.columns([1.7, 1.7, 2.1, 1.45, 2.1, 1.2, 1.1], gap="small")
 with control_cols[0]:
     st.markdown('<div class="top-shell-select">', unsafe_allow_html=True)
     symbol = st.selectbox("Symbol", list(INSTRUMENTS.keys()), label_visibility="collapsed")
@@ -377,6 +383,7 @@ with control_cols[4]:
 with control_cols[5]:
     st.markdown(f'<div class="top-shell"><div class="sync-wrap"><div class="sync-text">SYNC: {REFRESH_RATE}s</div><div class="sync-bar"><div></div></div></div></div>', unsafe_allow_html=True)
 with control_cols[6]:
+    st.markdown("<div style=\"margin-top:2px\"></div>", unsafe_allow_html=True)
     if st.button("STOP"):
         auto_refresh = False
 
@@ -384,7 +391,7 @@ status_text, status_type = st.session_state.last_status
 status_color_map = {"info": "#2b4f77", "success": "#17743b", "error": "#c93c2a"}
 st.markdown(f'<div class="status-banner" style="background:{status_color_map.get(status_type, "#c93c2a")}">{status_text}</div>', unsafe_allow_html=True)
 
-upper_left, upper_mid, upper_right = st.columns([4.2, 4.2, 1.35])
+upper_left, upper_mid, upper_right = st.columns([4.35, 4.35, 1.3], gap="small")
 with upper_left:
     if result is not None:
         st.plotly_chart(build_bar_chart(result["subset"], "call_options.market_data.oi", "put_options.market_data.oi", "OI BUILDUP"), use_container_width=True)
@@ -396,7 +403,7 @@ with upper_mid:
     else:
         st.info(error_message or "No data")
 with upper_right:
-    st.markdown('<div class="panel">', unsafe_allow_html=True)
+    st.markdown('<div class="panel" style="padding-top:16px">', unsafe_allow_html=True)
     st.markdown(f'<div class="mini-card"><div class="mini-title mini-red">ACTIVE RES (CHG)</div><div class="mini-value">{result["active_res"] if result else "--"}</div></div>', unsafe_allow_html=True)
     st.markdown(f'<div class="mini-card"><div class="mini-title mini-green">ACTIVE SUP (CHG)</div><div class="mini-value">{result["active_sup"] if result else "--"}</div></div>', unsafe_allow_html=True)
     st.markdown(f'<div class="mini-card"><div class="mini-title mini-orange">BATTLEGROUND</div><div class="mini-value">{result["battleground"] if result else "--"}</div></div>', unsafe_allow_html=True)
