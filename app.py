@@ -28,9 +28,9 @@ GRID = "rgba(255,255,255,0.08)"
 BORDER = "rgba(255,255,255,0.09)"
 TEXT = "#f5f7fa"
 MUTED = "#99a1ab"
-SELECT_BG = "#1d5f99"
+SELECT_BG = "#000000"
 SELECT_BORDER = "#2a74b8"
-MENU_BG = "#101215"
+MENU_BG = "#000000"
 
 
 def get_secret(name, default=None):
