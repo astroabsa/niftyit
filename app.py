@@ -28,6 +28,9 @@ GRID = "rgba(255,255,255,0.08)"
 BORDER = "rgba(255,255,255,0.09)"
 TEXT = "#f5f7fa"
 MUTED = "#99a1ab"
+SELECT_BG = "#1d5f99"
+SELECT_BORDER = "#2a74b8"
+MENU_BG = "#101215"
 
 
 def get_secret(name, default=None):
@@ -56,22 +59,74 @@ st.markdown(
     f"""
     <style>
     .stApp {{background:{BG}; color:{TEXT};}}
-    .block-container {{padding-top: 0.65rem; padding-bottom: 0.5rem; max-width: 100%;}}
+    .block-container {{padding-top:0.65rem; padding-bottom:0.5rem; max-width:100%;}}
     h1, h2, h3, h4, h5, h6, p, div, span, label {{color:{TEXT};}}
-    [data-testid="stHeader"] {{background: transparent;}}
-    [data-testid="stToolbar"] {{right: 0.8rem;}}
-    [data-testid="stMetric"] {{background: transparent; border: none; padding: 0;}}
-    [data-testid="stMetricLabel"] {{display:none;}}
-    [data-testid="stMetricValue"] {{font-size: 1.1rem; font-weight: 700;}}
-    .top-shell {{background: linear-gradient(90deg,#1a1c20,#1d1e21); border:1px solid {BORDER}; border-radius:8px; padding:10px 14px; margin-bottom:12px; min-height:62px; display:flex; align-items:center;}}
+    [data-testid="stHeader"] {{background:transparent;}}
+    [data-testid="stToolbar"] {{right:0.8rem;}}
+    .top-shell {{background:linear-gradient(90deg,#1a1c20,#1d1e21); border:1px solid {BORDER}; border-radius:8px; padding:10px 14px; margin-bottom:12px; min-height:62px; display:flex; align-items:center;}}
     .top-shell-select {{margin-bottom:12px;}}
-    .top-shell-select [data-baseweb="select"] > div {{background:#16548b !important; border:1px solid #2e6ea5 !important; min-height:46px; color:#ffffff !important;}}
-    .top-shell-select [data-baseweb="select"] span, .top-shell-select [data-baseweb="select"] div {{color:#ffffff !important;}}
-    .top-shell-select [data-baseweb="select"] svg {{fill:#ffffff !important; color:#ffffff !important;}}
-    div[data-baseweb="popover"] ul, div[data-baseweb="menu"] {{background:#111214 !important; color:#ffffff !important;}}
-    div[data-baseweb="popover"] li, div[role="option"], ul[role="listbox"] li {{background:#111214 !important; color:#ffffff !important;}}
-    div[data-baseweb="popover"] li:hover, div[role="option"]:hover, ul[role="listbox"] li:hover {{background:#1b5d99 !important; color:#ffffff !important;}}
-    div[data-baseweb="popover"] li[aria-selected="true"], div[role="option"][aria-selected="true"], ul[role="listbox"] li[aria-selected="true"] {{background:#16548b !important; color:#ffffff !important;}}
+
+    .top-shell-select div[data-baseweb="select"] > div,
+    .top-shell-select div[data-baseweb="select"] > div:hover,
+    .top-shell-select div[data-baseweb="select"] > div:focus,
+    .top-shell-select div[data-baseweb="select"] > div:focus-within,
+    .top-shell-select [data-baseweb="base-input"] > div,
+    .top-shell-select [data-baseweb="input"] > div,
+    .top-shell-select [data-testid="stSelectbox"] div[data-baseweb="select"] > div {{
+        background:{SELECT_BG} !important;
+        border:1px solid {SELECT_BORDER} !important;
+        box-shadow:none !important;
+        color:#ffffff !important;
+        min-height:48px !important;
+    }}
+
+    .top-shell-select input,
+    .top-shell-select [data-baseweb="select"] input,
+    .top-shell-select [data-baseweb="select"] div,
+    .top-shell-select [data-baseweb="select"] span,
+    .top-shell-select [data-testid="stSelectbox"] * {{
+        color:#ffffff !important;
+        -webkit-text-fill-color:#ffffff !important;
+        caret-color:#ffffff !important;
+    }}
+
+    .top-shell-select svg,
+    .top-shell-select [data-baseweb="select"] svg {{
+        fill:#ffffff !important;
+        color:#ffffff !important;
+    }}
+
+    div[data-baseweb="popover"],
+    div[data-baseweb="popover"] > div,
+    div[data-baseweb="popover"] ul,
+    div[data-baseweb="menu"],
+    ul[role="listbox"] {{
+        background:{MENU_BG} !important;
+        color:#ffffff !important;
+        border:1px solid {SELECT_BORDER} !important;
+    }}
+
+    div[data-baseweb="popover"] li,
+    div[role="option"],
+    ul[role="listbox"] li {{
+        background:{MENU_BG} !important;
+        color:#ffffff !important;
+    }}
+
+    div[data-baseweb="popover"] li:hover,
+    div[role="option"]:hover,
+    ul[role="listbox"] li:hover {{
+        background:{SELECT_BG} !important;
+        color:#ffffff !important;
+    }}
+
+    div[data-baseweb="popover"] li[aria-selected="true"],
+    div[role="option"][aria-selected="true"],
+    ul[role="listbox"] li[aria-selected="true"] {{
+        background:{SELECT_BG} !important;
+        color:#ffffff !important;
+    }}
+
     .metric-inline {{font-size:13px; font-weight:800; margin-top:25px; white-space:nowrap;}}
     .metric-blue {{color:{BLUE};}}
     .metric-purple {{color:{PURPLE};}}
@@ -123,7 +178,6 @@ def load_expiry_choices(option_key):
     return expiries or [DEFAULT_EXPIRY_DATE]
 
 
-
 def get_market_data(config):
     quote_keys = [config["quote_key"], INDIA_VIX_QUOTE_KEY]
     url = f"https://api.upstox.com/v2/market-quote/quotes?instrument_key={','.join(quote_keys)}"
@@ -140,7 +194,6 @@ def get_market_data(config):
     return spot, vix
 
 
-
 def get_option_chain(config, expiry):
     url = f"https://api.upstox.com/v2/option/chain?instrument_key={config['option_key']}&expiry_date={expiry}"
     r = requests.get(url, headers=api_headers(), timeout=15)
@@ -154,7 +207,6 @@ def get_option_chain(config, expiry):
     return data
 
 
-
 def send_telegram(msg):
     if not TG_BOT_TOKEN or not TG_CHAT_ID or not msg.strip():
         return False
@@ -164,7 +216,6 @@ def send_telegram(msg):
         return True
     except Exception:
         return False
-
 
 
 def base_layout(title, height=330):
@@ -181,7 +232,6 @@ def base_layout(title, height=330):
     )
 
 
-
 def build_bar_chart(subset, left_col, right_col, title):
     fig = go.Figure()
     x = subset["strike_price"].astype(str)
@@ -189,7 +239,6 @@ def build_bar_chart(subset, left_col, right_col, title):
     fig.add_bar(x=x, y=subset[right_col], name="PUT", marker_color=GREEN)
     fig.update_layout(**base_layout(title, 330), barmode="group")
     return fig
-
 
 
 def build_line_chart(history, title, color):
@@ -200,7 +249,6 @@ def build_line_chart(history, title, color):
         fig.add_trace(go.Scatter(x=x, y=y, mode="lines+markers", line=dict(color=color, width=2), marker=dict(size=5)))
     fig.update_layout(**base_layout(title, 300), showlegend=False)
     return fig
-
 
 
 def analyze(data, spot, vix, symbol, expiry):
@@ -305,11 +353,9 @@ with control_cols[1]:
     expiry = st.selectbox("Expiry", expiries, index=default_index, label_visibility="collapsed")
     st.markdown('</div>', unsafe_allow_html=True)
 
-refresh_rate = REFRESH_RATE
-auto_refresh = True
-
 result = None
 error_message = None
+auto_refresh = True
 try:
     spot, vix = get_market_data(config)
     chain = get_option_chain(config, expiry)
