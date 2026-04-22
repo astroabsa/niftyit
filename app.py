@@ -39,7 +39,7 @@ li[role="option"]:hover { background: #1a1a2e !important; }
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-    ">FnO Intelligence Terminal</span>
+    ">FnO Terminal</span>
     <span style="
         margin-left: auto;
         font-size: 11px;
