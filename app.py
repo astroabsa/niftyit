@@ -21,6 +21,33 @@ ul[role="listbox"] * { background-color: #000000 !important; color: #ffffff !imp
 li[role="option"] { background: #000000 !important; color: #ffffff !important; }
 li[role="option"]:hover { background: #1a1a2e !important; }
 </style>
+<div style="
+    background: linear-gradient(90deg, #0d1117, #0f1a2e, #0d1117);
+    border-bottom: 1px solid rgba(57,164,255,0.25);
+    padding: 10px 20px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+">
+    <span style="font-size:22px;">📊</span>
+    <span style="
+        font-size: 22px;
+        font-weight: 900;
+        letter-spacing: 0.06em;
+        background: linear-gradient(90deg, #39a4ff, #b46cff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    ">FnO Intelligence Terminal</span>
+    <span style="
+        margin-left: auto;
+        font-size: 11px;
+        color: #99a1ab;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+    ">LIVE · NSE/BSE · INDIA VIX</span>
+</div>
 """, unsafe_allow_html=True)
 
 INDIA_VIX_QUOTE_KEY = "NSE_INDEX|India VIX"
