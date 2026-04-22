@@ -23,7 +23,6 @@ GREEN = "#20e27a"
 PURPLE = "#b46cff"
 YELLOW = "#f4c542"
 BLUE = "#39a4ff"
-PANEL = "#111214"
 BG = "#0c0d0f"
 GRID = "rgba(255,255,255,0.08)"
 BORDER = "rgba(255,255,255,0.09)"
@@ -64,9 +63,15 @@ st.markdown(
     [data-testid="stMetric"] {{background: transparent; border: none; padding: 0;}}
     [data-testid="stMetricLabel"] {{display:none;}}
     [data-testid="stMetricValue"] {{font-size: 1.1rem; font-weight: 700;}}
-    div[data-baseweb="select"] > div {{background:#16548b; border:1px solid #2e6ea5; min-height:40px;}}
-    .top-shell {{background: linear-gradient(90deg,#1a1c20,#1d1e21); border:1px solid {BORDER}; border-radius:8px; padding:10px 14px; margin-bottom:12px;}}
-    .top-label {{font-size:12px; color:#b4bac4; font-weight:700; letter-spacing:0.04em; margin-bottom:6px;}}
+    .top-shell {{background: linear-gradient(90deg,#1a1c20,#1d1e21); border:1px solid {BORDER}; border-radius:8px; padding:10px 14px; margin-bottom:12px; min-height:62px; display:flex; align-items:center;}}
+    .top-shell-select {{margin-bottom:12px;}}
+    .top-shell-select [data-baseweb="select"] > div {{background:#16548b !important; border:1px solid #2e6ea5 !important; min-height:46px; color:#ffffff !important;}}
+    .top-shell-select [data-baseweb="select"] span, .top-shell-select [data-baseweb="select"] div {{color:#ffffff !important;}}
+    .top-shell-select [data-baseweb="select"] svg {{fill:#ffffff !important; color:#ffffff !important;}}
+    div[data-baseweb="popover"] ul, div[data-baseweb="menu"] {{background:#111214 !important; color:#ffffff !important;}}
+    div[data-baseweb="popover"] li, div[role="option"], ul[role="listbox"] li {{background:#111214 !important; color:#ffffff !important;}}
+    div[data-baseweb="popover"] li:hover, div[role="option"]:hover, ul[role="listbox"] li:hover {{background:#1b5d99 !important; color:#ffffff !important;}}
+    div[data-baseweb="popover"] li[aria-selected="true"], div[role="option"][aria-selected="true"], ul[role="listbox"] li[aria-selected="true"] {{background:#16548b !important; color:#ffffff !important;}}
     .metric-inline {{font-size:13px; font-weight:800; margin-top:25px; white-space:nowrap;}}
     .metric-blue {{color:{BLUE};}}
     .metric-purple {{color:{PURPLE};}}
@@ -95,7 +100,6 @@ st.markdown(
     .stButton > button {{width:100%; border-radius:8px; border:none; min-height:42px; font-weight:800; background:#ff1d13; color:white;}}
     .stButton > button:hover {{background:#ff2b22; color:white;}}
     .stDataFrame {{border:1px solid {BORDER}; border-radius:8px; overflow:hidden;}}
-    .app-title {{display:none;}}
     </style>
     """,
     unsafe_allow_html=True,
@@ -284,7 +288,7 @@ if not ACCESS_TOKEN:
 
 control_cols = st.columns([1.6, 1.6, 2.2, 1.5, 2.2, 1.4, 1.6])
 with control_cols[0]:
-    st.markdown('<div class="top-shell"><div class="top-label">SYMBOL</div>', unsafe_allow_html=True)
+    st.markdown('<div class="top-shell-select">', unsafe_allow_html=True)
     symbol = st.selectbox("Symbol", list(INSTRUMENTS.keys()), label_visibility="collapsed")
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -296,14 +300,13 @@ except Exception:
     expiries = [DEFAULT_EXPIRY_DATE]
 
 with control_cols[1]:
-    st.markdown('<div class="top-shell"><div class="top-label">EXPIRY</div>', unsafe_allow_html=True)
+    st.markdown('<div class="top-shell-select">', unsafe_allow_html=True)
     default_index = expiries.index(DEFAULT_EXPIRY_DATE) if DEFAULT_EXPIRY_DATE in expiries else 0
     expiry = st.selectbox("Expiry", expiries, index=default_index, label_visibility="collapsed")
     st.markdown('</div>', unsafe_allow_html=True)
 
 refresh_rate = REFRESH_RATE
 auto_refresh = True
-manual_refresh = False
 
 result = None
 error_message = None
@@ -328,26 +331,22 @@ with control_cols[4]:
 with control_cols[5]:
     st.markdown(f'<div class="top-shell"><div class="sync-wrap"><div class="sync-text">SYNC: {REFRESH_RATE}s</div><div class="sync-bar"><div></div></div></div></div>', unsafe_allow_html=True)
 with control_cols[6]:
-    st.markdown('<div style="margin-top:2px"></div>', unsafe_allow_html=True)
     if st.button("STOP"):
         auto_refresh = False
 
 status_text, status_type = st.session_state.last_status
 status_color_map = {"info": "#2b4f77", "success": "#17743b", "error": "#c93c2a"}
-status_html = f'<div class="status-banner" style="background:{status_color_map.get(status_type, "#c93c2a")}">{status_text}</div>'
-st.markdown(status_html, unsafe_allow_html=True)
+st.markdown(f'<div class="status-banner" style="background:{status_color_map.get(status_type, "#c93c2a")}">{status_text}</div>', unsafe_allow_html=True)
 
 upper_left, upper_mid, upper_right = st.columns([4.2, 4.2, 1.35])
 with upper_left:
     if result is not None:
-        fig1 = build_bar_chart(result["subset"], "call_options.market_data.oi", "put_options.market_data.oi", "OI BUILDUP")
-        st.plotly_chart(fig1, use_container_width=True)
+        st.plotly_chart(build_bar_chart(result["subset"], "call_options.market_data.oi", "put_options.market_data.oi", "OI BUILDUP"), use_container_width=True)
     else:
         st.info(error_message or "No data")
 with upper_mid:
     if result is not None:
-        fig2 = build_bar_chart(result["subset"], "call_chg_oi", "put_chg_oi", "CHANGE IN OI")
-        st.plotly_chart(fig2, use_container_width=True)
+        st.plotly_chart(build_bar_chart(result["subset"], "call_chg_oi", "put_chg_oi", "CHANGE IN OI"), use_container_width=True)
     else:
         st.info(error_message or "No data")
 with upper_right:
@@ -359,21 +358,13 @@ with upper_right:
 
 bear_label = f"{int(result['bull_prob'])}% BULL" if result and result['bull_prob'] >= 50 else f"{int(result['bull_prob'])}% BEAR" if result else "--"
 prob_fill = int(result['bull_prob']) if result else 50
-st.markdown(
-    f'<div class="prob-shell"><div class="prob-row"><div class="prob-text">{bear_label}</div><div class="prob-bar"><div class="prob-fill" style="width:{prob_fill}%"></div></div></div></div>',
-    unsafe_allow_html=True,
-)
+st.markdown(f'<div class="prob-shell"><div class="prob-row"><div class="prob-text">{bear_label}</div><div class="prob-bar"><div class="prob-fill" style="width:{prob_fill}%"></div></div></div></div>', unsafe_allow_html=True)
 
 bottom_left, bottom_right = st.columns(2)
 with bottom_left:
-    pcr_fig = build_line_chart(st.session_state.pcr_history, "PCR TREND", PURPLE)
-    st.plotly_chart(pcr_fig, use_container_width=True)
+    st.plotly_chart(build_line_chart(st.session_state.pcr_history, "PCR TREND", PURPLE), use_container_width=True)
 with bottom_right:
-    vix_color = GREEN
-    if len(st.session_state.vix_history) > 1 and st.session_state.vix_history[-1][1] >= st.session_state.vix_history[0][1]:
-        vix_color = GREEN
-    vix_fig = build_line_chart(st.session_state.vix_history, "INDIA VIX TREND", vix_color)
-    st.plotly_chart(vix_fig, use_container_width=True)
+    st.plotly_chart(build_line_chart(st.session_state.vix_history, "INDIA VIX TREND", GREEN), use_container_width=True)
 
 st.markdown(f'<div class="trade-box"><div class="trade-title">{st.session_state.last_signal}</div><div class="trade-note">{st.session_state.last_reason}</div></div>', unsafe_allow_html=True)
 if result is not None:
