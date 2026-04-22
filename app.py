@@ -28,9 +28,7 @@ GRID = "rgba(255,255,255,0.08)"
 BORDER = "rgba(255,255,255,0.09)"
 TEXT = "#f5f7fa"
 MUTED = "#99a1ab"
-SELECT_BG = "#000000"
 SELECT_BORDER = "#2a74b8"
-MENU_BG = "#000000"
 
 
 def get_secret(name, default=None):
@@ -64,86 +62,84 @@ st.markdown(
     [data-testid="stHeader"] {{background:transparent;}}
     [data-testid="stToolbar"] {{right:0.8rem;}}
     .top-shell {{background:linear-gradient(90deg,#1a1c20,#1d1e21); border:1px solid {BORDER}; border-radius:8px; padding:10px 14px; margin-bottom:12px; min-height:62px; display:flex; align-items:center;}}
-    .top-shell-select {{margin-bottom:12px;}}
 
-    /* ── Selectbox control box ── */
-    .top-shell-select [data-baseweb="select"] > div:first-child,
-    .top-shell-select [data-baseweb="select"] > div:first-child:hover,
-    .top-shell-select [data-baseweb="select"] > div:first-child:focus-within {{
-        background-color: {SELECT_BG} !important;
-        background: {SELECT_BG} !important;
+    /* ===== GLOBAL SELECTBOX OVERRIDES ===== */
+
+    /* The outer visible control box */
+    div[data-baseweb="select"] > div {{
+        background-color: #000000 !important;
+        background: #000000 !important;
         border: 1px solid {SELECT_BORDER} !important;
         box-shadow: none !important;
         min-height: 48px !important;
     }}
 
-    /* ── All children inside the select control ── */
-    .top-shell-select [data-baseweb="select"] *,
-    .top-shell-select [data-baseweb="input"],
-    .top-shell-select [data-baseweb="input"] > div,
-    .top-shell-select [data-baseweb="base-input"],
-    .top-shell-select [data-baseweb="base-input"] > div {{
-        background-color: {SELECT_BG} !important;
-        background: {SELECT_BG} !important;
+    /* Every child element inside the select */
+    div[data-baseweb="select"] *,
+    div[data-baseweb="select"] > div,
+    div[data-baseweb="select"] > div > div,
+    div[data-baseweb="select"] > div > div > div {{
+        background-color: #000000 !important;
+        background: #000000 !important;
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+    }}
+
+    /* Caret / chevron icon */
+    div[data-baseweb="select"] svg {{
+        fill: #ffffff !important;
+    }}
+
+    /* Input inside select */
+    div[data-baseweb="select"] input {{
+        background-color: #000000 !important;
         color: #ffffff !important;
         -webkit-text-fill-color: #ffffff !important;
         caret-color: #ffffff !important;
     }}
 
-    /* ── Arrow / chevron icon ── */
-    .top-shell-select [data-baseweb="select"] svg,
-    .top-shell-select [data-baseweb="select"] svg * {{
-        fill: #ffffff !important;
-        color: #ffffff !important;
-    }}
-
-    /* ── Dropdown popup list ── */
-    [data-baseweb="popover"],
-    [data-baseweb="popover"] > div,
-    [data-baseweb="popover"] ul,
-    [data-baseweb="menu"],
+    /* ===== DROPDOWN POPUP ===== */
+    div[data-baseweb="popover"],
+    div[data-baseweb="popover"] > div,
+    div[data-baseweb="menu"],
     ul[role="listbox"] {{
-        background-color: {MENU_BG} !important;
-        background: {MENU_BG} !important;
-        color: #ffffff !important;
+        background-color: #000000 !important;
+        background: #000000 !important;
         border: 1px solid {SELECT_BORDER} !important;
     }}
 
-    /* ── Dropdown list items ── */
-    [data-baseweb="popover"] li,
-    [data-baseweb="menu"] li,
-    [data-baseweb="menu"] [role="option"],
-    ul[role="listbox"] li {{
-        background-color: {MENU_BG} !important;
-        background: {MENU_BG} !important;
-        color: #ffffff !important;
-    }}
-
-    /* ── Hover state ── */
-    [data-baseweb="popover"] li:hover,
-    [data-baseweb="menu"] [role="option"]:hover,
-    ul[role="listbox"] li:hover {{
-        background-color: #1a1a1a !important;
-        background: #1a1a1a !important;
-        color: #ffffff !important;
-    }}
-
-    /* ── Selected item ── */
-    [data-baseweb="popover"] li[aria-selected="true"],
-    [data-baseweb="menu"] [role="option"][aria-selected="true"],
-    ul[role="listbox"] li[aria-selected="true"] {{
-        background-color: #1d5f99 !important;
-        background: #1d5f99 !important;
-        color: #ffffff !important;
-    }}
-
-    /* ── All text inside popup ── */
-    [data-baseweb="popover"] *,
-    [data-baseweb="menu"] * {{
+    /* Popup list items */
+    div[data-baseweb="menu"] li,
+    div[data-baseweb="menu"] [role="option"],
+    ul[role="listbox"] > li {{
+        background-color: #000000 !important;
         color: #ffffff !important;
         -webkit-text-fill-color: #ffffff !important;
     }}
 
+    /* Hover */
+    div[data-baseweb="menu"] li:hover,
+    div[data-baseweb="menu"] [role="option"]:hover,
+    ul[role="listbox"] > li:hover {{
+        background-color: #1a1a2e !important;
+        color: #ffffff !important;
+    }}
+
+    /* Selected */
+    div[data-baseweb="menu"] li[aria-selected="true"],
+    div[data-baseweb="menu"] [role="option"][aria-selected="true"] {{
+        background-color: #1d5f99 !important;
+        color: #ffffff !important;
+    }}
+
+    /* All text inside popup */
+    div[data-baseweb="popover"] *,
+    div[data-baseweb="menu"] * {{
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+    }}
+
+    /* ===== REST OF APP STYLES ===== */
     .metric-inline {{font-size:13px; font-weight:800; margin-top:25px; white-space:nowrap;}}
     .metric-blue {{color:{BLUE};}}
     .metric-purple {{color:{PURPLE};}}
@@ -353,9 +349,7 @@ if not ACCESS_TOKEN:
 
 control_cols = st.columns([1.6, 1.6, 2.2, 1.5, 2.2, 1.4, 1.6])
 with control_cols[0]:
-    st.markdown('<div class="top-shell-select">', unsafe_allow_html=True)
     symbol = st.selectbox("Symbol", list(INSTRUMENTS.keys()), label_visibility="collapsed")
-    st.markdown('</div>', unsafe_allow_html=True)
 
 config = INSTRUMENTS[symbol]
 
@@ -365,10 +359,8 @@ except Exception:
     expiries = [DEFAULT_EXPIRY_DATE]
 
 with control_cols[1]:
-    st.markdown('<div class="top-shell-select">', unsafe_allow_html=True)
     default_index = expiries.index(DEFAULT_EXPIRY_DATE) if DEFAULT_EXPIRY_DATE in expiries else 0
     expiry = st.selectbox("Expiry", expiries, index=default_index, label_visibility="collapsed")
-    st.markdown('</div>', unsafe_allow_html=True)
 
 result = None
 error_message = None
