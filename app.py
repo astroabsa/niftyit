@@ -66,65 +66,82 @@ st.markdown(
     .top-shell {{background:linear-gradient(90deg,#1a1c20,#1d1e21); border:1px solid {BORDER}; border-radius:8px; padding:10px 14px; margin-bottom:12px; min-height:62px; display:flex; align-items:center;}}
     .top-shell-select {{margin-bottom:12px;}}
 
-    .top-shell-select div[data-baseweb="select"] > div,
-    .top-shell-select div[data-baseweb="select"] > div:hover,
-    .top-shell-select div[data-baseweb="select"] > div:focus,
-    .top-shell-select div[data-baseweb="select"] > div:focus-within,
-    .top-shell-select [data-baseweb="base-input"] > div,
+    /* ── Selectbox control box ── */
+    .top-shell-select [data-baseweb="select"] > div:first-child,
+    .top-shell-select [data-baseweb="select"] > div:first-child:hover,
+    .top-shell-select [data-baseweb="select"] > div:first-child:focus-within {{
+        background-color: {SELECT_BG} !important;
+        background: {SELECT_BG} !important;
+        border: 1px solid {SELECT_BORDER} !important;
+        box-shadow: none !important;
+        min-height: 48px !important;
+    }}
+
+    /* ── All children inside the select control ── */
+    .top-shell-select [data-baseweb="select"] *,
+    .top-shell-select [data-baseweb="input"],
     .top-shell-select [data-baseweb="input"] > div,
-    .top-shell-select [data-testid="stSelectbox"] div[data-baseweb="select"] > div {{
-        background:{SELECT_BG} !important;
-        border:1px solid {SELECT_BORDER} !important;
-        box-shadow:none !important;
-        color:#ffffff !important;
-        min-height:48px !important;
+    .top-shell-select [data-baseweb="base-input"],
+    .top-shell-select [data-baseweb="base-input"] > div {{
+        background-color: {SELECT_BG} !important;
+        background: {SELECT_BG} !important;
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+        caret-color: #ffffff !important;
     }}
 
-    .top-shell-select input,
-    .top-shell-select [data-baseweb="select"] input,
-    .top-shell-select [data-baseweb="select"] div,
-    .top-shell-select [data-baseweb="select"] span,
-    .top-shell-select [data-testid="stSelectbox"] * {{
-        color:#ffffff !important;
-        -webkit-text-fill-color:#ffffff !important;
-        caret-color:#ffffff !important;
+    /* ── Arrow / chevron icon ── */
+    .top-shell-select [data-baseweb="select"] svg,
+    .top-shell-select [data-baseweb="select"] svg * {{
+        fill: #ffffff !important;
+        color: #ffffff !important;
     }}
 
-    .top-shell-select svg,
-    .top-shell-select [data-baseweb="select"] svg {{
-        fill:#ffffff !important;
-        color:#ffffff !important;
-    }}
-
-    div[data-baseweb="popover"],
-    div[data-baseweb="popover"] > div,
-    div[data-baseweb="popover"] ul,
-    div[data-baseweb="menu"],
+    /* ── Dropdown popup list ── */
+    [data-baseweb="popover"],
+    [data-baseweb="popover"] > div,
+    [data-baseweb="popover"] ul,
+    [data-baseweb="menu"],
     ul[role="listbox"] {{
-        background:{MENU_BG} !important;
-        color:#ffffff !important;
-        border:1px solid {SELECT_BORDER} !important;
+        background-color: {MENU_BG} !important;
+        background: {MENU_BG} !important;
+        color: #ffffff !important;
+        border: 1px solid {SELECT_BORDER} !important;
     }}
 
-    div[data-baseweb="popover"] li,
-    div[role="option"],
+    /* ── Dropdown list items ── */
+    [data-baseweb="popover"] li,
+    [data-baseweb="menu"] li,
+    [data-baseweb="menu"] [role="option"],
     ul[role="listbox"] li {{
-        background:{MENU_BG} !important;
-        color:#ffffff !important;
+        background-color: {MENU_BG} !important;
+        background: {MENU_BG} !important;
+        color: #ffffff !important;
     }}
 
-    div[data-baseweb="popover"] li:hover,
-    div[role="option"]:hover,
+    /* ── Hover state ── */
+    [data-baseweb="popover"] li:hover,
+    [data-baseweb="menu"] [role="option"]:hover,
     ul[role="listbox"] li:hover {{
-        background:{SELECT_BG} !important;
-        color:#ffffff !important;
+        background-color: #1a1a1a !important;
+        background: #1a1a1a !important;
+        color: #ffffff !important;
     }}
 
-    div[data-baseweb="popover"] li[aria-selected="true"],
-    div[role="option"][aria-selected="true"],
+    /* ── Selected item ── */
+    [data-baseweb="popover"] li[aria-selected="true"],
+    [data-baseweb="menu"] [role="option"][aria-selected="true"],
     ul[role="listbox"] li[aria-selected="true"] {{
-        background:{SELECT_BG} !important;
-        color:#ffffff !important;
+        background-color: #1d5f99 !important;
+        background: #1d5f99 !important;
+        color: #ffffff !important;
+    }}
+
+    /* ── All text inside popup ── */
+    [data-baseweb="popover"] *,
+    [data-baseweb="menu"] * {{
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
     }}
 
     .metric-inline {{font-size:13px; font-weight:800; margin-top:25px; white-space:nowrap;}}
@@ -310,7 +327,7 @@ def analyze(data, spot, vix, symbol, expiry):
         if vix is not None:
             lines.append(f"India VIX: {vix:.2f}")
         lines.extend([f"Active Res: {active_res}", f"Active Sup: {active_sup}", f"Status: {alert_emoji} {alert_msg}"])
-        send_telegram("\n".join(lines))
+        send_telegram("\\n".join(lines))
         st.session_state.last_reported_minute = now.minute
 
     st.session_state.prev_vix = vix
