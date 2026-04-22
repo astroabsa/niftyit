@@ -297,6 +297,7 @@ def base_layout(title, height=330):
         height=height,
         margin=dict(l=8, r=8, t=42, b=8),
         legend=dict(orientation="h", y=1.02, x=1, xanchor="right"),
+        font=dict(color="#ffffff")),
         xaxis=dict(showgrid=True, gridcolor=GRID, zeroline=False, tickfont=dict(color="#d3d7dd")),
         yaxis=dict(showgrid=True, gridcolor=GRID, zeroline=False, tickfont=dict(color="#d3d7dd")),
     )
