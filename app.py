@@ -5,7 +5,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import requests
 import streamlit as st
-import pytz
+from zoneinfo import ZoneInfo
 
 st.set_page_config(page_title="FNO Intelligence Terminal", layout="wide")
 
@@ -44,7 +44,7 @@ BORDER = "rgba(255,255,255,0.09)"
 TEXT = "#f5f7fa"
 MUTED = "#99a1ab"
 SELECT_BORDER = "#2a74b8"
-IST = pytz.timezone("Asia/Kolkata")
+IST = ZoneInfo("Asia/Kolkata")
 
 
 def get_secret(name, default=None):
