@@ -8,6 +8,20 @@ import streamlit as st
 
 st.set_page_config(page_title="FNO Intelligence Terminal", layout="wide")
 
+# Early injection to catch portal-rendered dropdown popup
+st.markdown("""
+<style>
+div[data-baseweb="popover"] { background: #000000 !important; }
+div[data-baseweb="popover"] * { background-color: #000000 !important; color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; }
+div[data-baseweb="menu"] { background: #000000 !important; }
+div[data-baseweb="menu"] * { background-color: #000000 !important; color: #ffffff !important; }
+ul[role="listbox"] { background: #000000 !important; }
+ul[role="listbox"] * { background-color: #000000 !important; color: #ffffff !important; }
+li[role="option"] { background: #000000 !important; color: #ffffff !important; }
+li[role="option"]:hover { background: #1a1a2e !important; }
+</style>
+""", unsafe_allow_html=True)
+
 INDIA_VIX_QUOTE_KEY = "NSE_INDEX|India VIX"
 INDIA_VIX_DATA_KEY = "NSE_INDEX:India VIX"
 INSTRUMENTS = {
@@ -63,9 +77,7 @@ st.markdown(
     [data-testid="stToolbar"] {{right:0.8rem;}}
     .top-shell {{background:linear-gradient(90deg,#1a1c20,#1d1e21); border:1px solid {BORDER}; border-radius:8px; padding:10px 14px; margin-bottom:12px; min-height:62px; display:flex; align-items:center;}}
 
-    /* ===== GLOBAL SELECTBOX OVERRIDES ===== */
-
-    /* The outer visible control box */
+    /* ===== SELECTBOX CONTROL (CLOSED STATE) ===== */
     div[data-baseweb="select"] > div {{
         background-color: #000000 !important;
         background: #000000 !important;
@@ -74,7 +86,6 @@ st.markdown(
         min-height: 48px !important;
     }}
 
-    /* Every child element inside the select */
     div[data-baseweb="select"] *,
     div[data-baseweb="select"] > div,
     div[data-baseweb="select"] > div > div,
@@ -85,12 +96,10 @@ st.markdown(
         -webkit-text-fill-color: #ffffff !important;
     }}
 
-    /* Caret / chevron icon */
     div[data-baseweb="select"] svg {{
         fill: #ffffff !important;
     }}
 
-    /* Input inside select */
     div[data-baseweb="select"] input {{
         background-color: #000000 !important;
         color: #ffffff !important;
@@ -98,45 +107,39 @@ st.markdown(
         caret-color: #ffffff !important;
     }}
 
-    /* ===== DROPDOWN POPUP ===== */
+    /* ===== DROPDOWN POPUP (OPEN STATE) ===== */
     div[data-baseweb="popover"],
     div[data-baseweb="popover"] > div,
+    div[data-baseweb="popover"] > div > div,
     div[data-baseweb="menu"],
-    ul[role="listbox"] {{
+    div[data-baseweb="menu"] > div,
+    ul[role="listbox"],
+    ul[role="listbox"] > li {{
         background-color: #000000 !important;
         background: #000000 !important;
         border: 1px solid {SELECT_BORDER} !important;
+        color: #ffffff !important;
     }}
 
-    /* Popup list items */
-    div[data-baseweb="menu"] li,
-    div[data-baseweb="menu"] [role="option"],
-    ul[role="listbox"] > li {{
+    div[data-baseweb="popover"] *,
+    div[data-baseweb="menu"] *,
+    ul[role="listbox"] * {{
         background-color: #000000 !important;
+        background: #000000 !important;
         color: #ffffff !important;
         -webkit-text-fill-color: #ffffff !important;
     }}
 
-    /* Hover */
-    div[data-baseweb="menu"] li:hover,
     div[data-baseweb="menu"] [role="option"]:hover,
     ul[role="listbox"] > li:hover {{
         background-color: #1a1a2e !important;
-        color: #ffffff !important;
+        background: #1a1a2e !important;
     }}
 
-    /* Selected */
-    div[data-baseweb="menu"] li[aria-selected="true"],
-    div[data-baseweb="menu"] [role="option"][aria-selected="true"] {{
+    div[data-baseweb="menu"] [role="option"][aria-selected="true"],
+    ul[role="listbox"] > li[aria-selected="true"] {{
         background-color: #1d5f99 !important;
-        color: #ffffff !important;
-    }}
-
-    /* All text inside popup */
-    div[data-baseweb="popover"] *,
-    div[data-baseweb="menu"] * {{
-        color: #ffffff !important;
-        -webkit-text-fill-color: #ffffff !important;
+        background: #1d5f99 !important;
     }}
 
     /* ===== REST OF APP STYLES ===== */
