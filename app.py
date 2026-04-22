@@ -5,6 +5,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import requests
 import streamlit as st
+import pytz
 
 st.set_page_config(page_title="FNO Intelligence Terminal", layout="wide")
 
@@ -43,6 +44,7 @@ BORDER = "rgba(255,255,255,0.09)"
 TEXT = "#f5f7fa"
 MUTED = "#99a1ab"
 SELECT_BORDER = "#2a74b8"
+IST = pytz.timezone("Asia/Kolkata")
 
 
 def get_secret(name, default=None):
@@ -63,6 +65,7 @@ for key, default in {
     "last_signal": "AI SCANNING...",
     "last_reason": "Waiting for data...",
     "last_status": ("SYSTEM READY - SELECT SYMBOL AND EXPIRY", "info"),
+    "countdown": REFRESH_RATE,
 }.items():
     if key not in st.session_state:
         st.session_state[key] = default
@@ -179,31 +182,16 @@ st.markdown(
         background: #1d5f99 !important;
     }}
 
-    /* ===== STOP BUTTON SAME HEIGHT ===== */
-    div[data-testid="stHorizontalBlock"] > div[data-testid="stColumn"] .stButton > button {{
-        height: 62px !important;
-        min-height: 62px !important;
-        width: 100% !important;
-        border-radius: 8px !important;
-        border: none !important;
-        font-weight: 800 !important;
-        background: #ff1d13 !important;
-        color: white !important;
-        margin-top: 0px !important;
-    }}
-    div[data-testid="stHorizontalBlock"] > div[data-testid="stColumn"] .stButton > button:hover {{
-        background: #ff2b22 !important;
-    }}
-
     /* ===== REST OF APP STYLES ===== */
     .metric-inline {{font-size:13px; font-weight:800; white-space:nowrap;}}
     .metric-blue {{color:{BLUE};}}
     .metric-purple {{color:{PURPLE};}}
     .metric-yellow {{color:{YELLOW};}}
-    .sync-wrap {{display:flex; align-items:center; gap:10px; justify-content:flex-end; width:100%;}}
-    .sync-text {{font-size:12px; color:{BLUE}; font-weight:800;}}
-    .sync-bar {{height:10px; width:110px; background:#3d434c; border-radius:999px; overflow:hidden;}}
-    .sync-bar > div {{height:100%; width:80%; background:{BLUE}; border-radius:999px;}}
+    .sync-wrap {{display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:62px;}}
+    .sync-label {{font-size:11px; color:{MUTED}; font-weight:700; letter-spacing:0.05em; margin-bottom:2px;}}
+    .sync-countdown {{font-size:26px; font-weight:900; color:{BLUE}; line-height:1;}}
+    .sync-unit {{font-size:11px; color:{MUTED}; margin-top:1px;}}
+    .market-closed-banner {{background:#1a1a2e; border:1px solid #2a74b8; color:{BLUE}; padding:12px 18px; border-radius:8px; font-size:16px; font-weight:800; text-align:center; margin-bottom:12px;}}
     .status-banner {{background:#c93c2a; color:white; padding:12px 18px; border-radius:8px; font-size:18px; font-weight:900; text-align:center; margin-bottom:12px; letter-spacing:0.02em;}}
     .panel {{background:#0f1012; border:1px solid {BORDER}; border-radius:8px; padding:8px;}}
     .mini-card {{background:#141518; border:1px solid {BORDER}; border-radius:8px; padding:16px 12px; text-align:center; margin-bottom:14px; min-height:84px; display:flex; flex-direction:column; justify-content:center;}}
@@ -226,6 +214,13 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
+
+def is_market_open():
+    now_ist = datetime.now(IST)
+    market_open = now_ist.replace(hour=9, minute=0, second=0, microsecond=0)
+    market_close = now_ist.replace(hour=15, minute=30, second=0, microsecond=0)
+    return market_open <= now_ist <= market_close
 
 
 def api_headers():
@@ -401,7 +396,8 @@ if not ACCESS_TOKEN:
     st.error("Missing ACCESS_TOKEN in secrets.toml")
     st.stop()
 
-control_cols = st.columns([1.6, 1.6, 2.2, 1.5, 2.2, 1.4, 1.6])
+# ── Top control row (no STOP button) ──────────────────────────────────────────
+control_cols = st.columns([1.6, 1.6, 2.2, 1.5, 2.2, 1.4])
 with control_cols[0]:
     symbol = st.selectbox("Symbol", list(INSTRUMENTS.keys()), label_visibility="collapsed")
 
@@ -418,18 +414,53 @@ with control_cols[1]:
 
 result = None
 error_message = None
-auto_refresh = True
-try:
-    spot, vix = get_market_data(config)
-    chain = get_option_chain(config, expiry)
-    result = analyze(chain, spot, vix, config["display_name"], expiry)
-except Exception as e:
-    error_message = str(e)
-    st.session_state.last_status = (f"❌ {error_message}", "error")
+
+# ── Market hours check ─────────────────────────────────────────────────────────
+market_open = is_market_open()
+
+if market_open:
+    try:
+        spot, vix = get_market_data(config)
+        chain = get_option_chain(config, expiry)
+        result = analyze(chain, spot, vix, config["display_name"], expiry)
+    except Exception as e:
+        error_message = str(e)
+        st.session_state.last_status = (f"❌ {error_message}", "error")
 
 spot_text = f"{result['spot']:,.2f}" if result else "--"
 pcr_text = f"{result['pcr']:.2f}" if result else "--"
 vix_text = f"{result['vix']:.2f} ({result['vix_chg']:+.2f}%)" if result and result['vix'] is not None else "--"
+
+# ── Countdown display ──────────────────────────────────────────────────────────
+now_ist = datetime.now(IST)
+if market_open:
+    seconds_left = REFRESH_RATE - (now_ist.second % REFRESH_RATE)
+    countdown_html = f"""
+    <div class="top-shell">
+      <div class="sync-wrap">
+        <div class="sync-label">NEXT REFRESH</div>
+        <div class="sync-countdown">{seconds_left}</div>
+        <div class="sync-unit">seconds</div>
+      </div>
+    </div>
+    """
+else:
+    next_open = now_ist.replace(hour=9, minute=0, second=0, microsecond=0)
+    if now_ist >= next_open:
+        from datetime import timedelta
+        next_open = next_open + timedelta(days=1)
+    diff = next_open - now_ist
+    hrs, rem = divmod(int(diff.total_seconds()), 3600)
+    mins = rem // 60
+    countdown_html = f"""
+    <div class="top-shell">
+      <div class="sync-wrap">
+        <div class="sync-label">MARKET OPENS IN</div>
+        <div class="sync-countdown">{hrs:02d}:{mins:02d}</div>
+        <div class="sync-unit">HH:MM</div>
+      </div>
+    </div>
+    """
 
 with control_cols[2]:
     st.markdown(f'<div class="top-shell"><div class="metric-inline metric-blue">{config["display_name"]} SPOT: {spot_text}</div></div>', unsafe_allow_html=True)
@@ -438,26 +469,28 @@ with control_cols[3]:
 with control_cols[4]:
     st.markdown(f'<div class="top-shell"><div class="metric-inline metric-yellow">INDIA VIX: {vix_text}</div></div>', unsafe_allow_html=True)
 with control_cols[5]:
-    st.markdown(f'<div class="top-shell"><div class="sync-wrap"><div class="sync-text">SYNC: {REFRESH_RATE}s</div><div class="sync-bar"><div></div></div></div></div>', unsafe_allow_html=True)
-with control_cols[6]:
-    if st.button("STOP"):
-        auto_refresh = False
+    st.markdown(countdown_html, unsafe_allow_html=True)
 
-status_text, status_type = st.session_state.last_status
-status_color_map = {"info": "#2b4f77", "success": "#17743b", "error": "#c93c2a"}
-st.markdown(f'<div class="status-banner" style="background:{status_color_map.get(status_type, "#c93c2a")}">{status_text}</div>', unsafe_allow_html=True)
+# ── Status banner ──────────────────────────────────────────────────────────────
+if not market_open:
+    now_str = now_ist.strftime("%I:%M %p")
+    st.markdown(f'<div class="market-closed-banner">🕐 MARKET CLOSED — Current IST: {now_str} | Trading hours: 9:00 AM – 3:30 PM</div>', unsafe_allow_html=True)
+else:
+    status_text, status_type = st.session_state.last_status
+    status_color_map = {"info": "#2b4f77", "success": "#17743b", "error": "#c93c2a"}
+    st.markdown(f'<div class="status-banner" style="background:{status_color_map.get(status_type, "#c93c2a")}">{status_text}</div>', unsafe_allow_html=True)
 
 upper_left, upper_mid, upper_right = st.columns([4.2, 4.2, 1.35])
 with upper_left:
     if result is not None:
         st.plotly_chart(build_bar_chart(result["subset"], "call_options.market_data.oi", "put_options.market_data.oi", "OI BUILDUP"), use_container_width=True)
     else:
-        st.info(error_message or "No data")
+        st.info(error_message or ("Market is closed" if not market_open else "No data"))
 with upper_mid:
     if result is not None:
         st.plotly_chart(build_bar_chart(result["subset"], "call_chg_oi", "put_chg_oi", "CHANGE IN OI"), use_container_width=True)
     else:
-        st.info(error_message or "No data")
+        st.info(error_message or ("Market is closed" if not market_open else "No data"))
 with upper_right:
     st.markdown('<div class="panel">', unsafe_allow_html=True)
     st.markdown(f'<div class="mini-card"><div class="mini-title mini-red">ACTIVE RES (CHG)</div><div class="mini-value">{result["active_res"] if result else "--"}</div></div>', unsafe_allow_html=True)
@@ -488,6 +521,11 @@ if result is not None:
     with st.expander("Show data table"):
         st.dataframe(table_df, use_container_width=True, hide_index=True)
 
-if auto_refresh:
+# ── Auto-refresh only during market hours ─────────────────────────────────────
+if market_open:
     time.sleep(REFRESH_RATE)
+    st.rerun()
+else:
+    # Recheck every 60s to detect when market opens
+    time.sleep(60)
     st.rerun()
