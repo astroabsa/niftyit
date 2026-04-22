@@ -151,11 +151,17 @@ st.markdown(
         min-height: 62px !important;
         height: 62px !important;
         border-radius: 8px !important;
+        display: flex !important;
+        align-items: center !important;
     }}
 
     div[data-baseweb="select"] *,
     div[data-baseweb="select"] > div,
-    div[data-baseweb="select"] > div > div,
+    div[data-baseweb="select"] > div > div {{
+    display: flex !important;
+    align-items: center !important;
+    height: 100% !important;
+    }}
     div[data-baseweb="select"] > div > div > div {{
         background-color: #000000 !important;
         background: #000000 !important;
