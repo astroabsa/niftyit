@@ -46,7 +46,7 @@ li[role="option"]:hover { background: #1a1a2e !important; }
         color: #99a1ab;
         font-weight: 600;
         letter-spacing: 0.05em;
-    ">LIVE · NSE/BSE · INDIA VIX</span>
+    "></span>
 </div>
 """, unsafe_allow_html=True)
 
