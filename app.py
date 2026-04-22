@@ -75,7 +75,45 @@ st.markdown(
     h1, h2, h3, h4, h5, h6, p, div, span, label {{color:{TEXT};}}
     [data-testid="stHeader"] {{background:transparent;}}
     [data-testid="stToolbar"] {{right:0.8rem;}}
-    .top-shell {{background:linear-gradient(90deg,#1a1c20,#1d1e21); border:1px solid {BORDER}; border-radius:8px; padding:10px 14px; margin-bottom:12px; min-height:62px; display:flex; align-items:center;}}
+
+    /* ===== UNIFORM TOP ROW HEIGHT ===== */
+    /* Force all column wrappers in top row to same height */
+    div[data-testid="stHorizontalBlock"] > div[data-testid="stColumn"] {{
+        display: flex !important;
+        align-items: stretch !important;
+    }}
+    div[data-testid="stHorizontalBlock"] > div[data-testid="stColumn"] > div {{
+        width: 100% !important;
+        display: flex !important;
+        align-items: center !important;
+    }}
+
+    /* Selectbox container forced to match top-shell height */
+    div[data-testid="stHorizontalBlock"] > div[data-testid="stColumn"] [data-testid="stSelectbox"] {{
+        width: 100% !important;
+    }}
+    div[data-testid="stHorizontalBlock"] > div[data-testid="stColumn"] [data-testid="stSelectbox"] > div,
+    div[data-testid="stHorizontalBlock"] > div[data-testid="stColumn"] [data-baseweb="select"] {{
+        width: 100% !important;
+    }}
+    div[data-testid="stHorizontalBlock"] > div[data-testid="stColumn"] div[data-baseweb="select"] > div {{
+        min-height: 62px !important;
+        height: 62px !important;
+    }}
+
+    .top-shell {{
+        background: linear-gradient(90deg,#1a1c20,#1d1e21);
+        border: 1px solid {BORDER};
+        border-radius: 8px;
+        padding: 10px 14px;
+        height: 62px;
+        min-height: 62px;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        box-sizing: border-box;
+        margin-bottom: 0px;
+    }}
 
     /* ===== SELECTBOX CONTROL (CLOSED STATE) ===== */
     div[data-baseweb="select"] > div {{
@@ -83,7 +121,9 @@ st.markdown(
         background: #000000 !important;
         border: 1px solid {SELECT_BORDER} !important;
         box-shadow: none !important;
-        min-height: 48px !important;
+        min-height: 62px !important;
+        height: 62px !important;
+        border-radius: 8px !important;
     }}
 
     div[data-baseweb="select"] *,
@@ -142,12 +182,28 @@ st.markdown(
         background: #1d5f99 !important;
     }}
 
+    /* ===== STOP BUTTON SAME HEIGHT ===== */
+    div[data-testid="stHorizontalBlock"] > div[data-testid="stColumn"] .stButton > button {{
+        height: 62px !important;
+        min-height: 62px !important;
+        width: 100% !important;
+        border-radius: 8px !important;
+        border: none !important;
+        font-weight: 800 !important;
+        background: #ff1d13 !important;
+        color: white !important;
+        margin-top: 0px !important;
+    }}
+    div[data-testid="stHorizontalBlock"] > div[data-testid="stColumn"] .stButton > button:hover {{
+        background: #ff2b22 !important;
+    }}
+
     /* ===== REST OF APP STYLES ===== */
-    .metric-inline {{font-size:13px; font-weight:800; margin-top:25px; white-space:nowrap;}}
+    .metric-inline {{font-size:13px; font-weight:800; white-space:nowrap;}}
     .metric-blue {{color:{BLUE};}}
     .metric-purple {{color:{PURPLE};}}
     .metric-yellow {{color:{YELLOW};}}
-    .sync-wrap {{display:flex; align-items:center; gap:10px; margin-top:24px; justify-content:flex-end;}}
+    .sync-wrap {{display:flex; align-items:center; gap:10px; justify-content:flex-end; width:100%;}}
     .sync-text {{font-size:12px; color:{BLUE}; font-weight:800;}}
     .sync-bar {{height:10px; width:110px; background:#3d434c; border-radius:999px; overflow:hidden;}}
     .sync-bar > div {{height:100%; width:80%; background:{BLUE}; border-radius:999px;}}
@@ -168,8 +224,6 @@ st.markdown(
     .trade-title {{font-size:24px; font-weight:900; color:{BLUE};}}
     .trade-note {{font-size:13px; color:#b8bec7; margin-top:6px;}}
     .small-caption {{font-size:12px; color:{MUTED}; text-align:right; margin-top:6px;}}
-    .stButton > button {{width:100%; border-radius:8px; border:none; min-height:42px; font-weight:800; background:#ff1d13; color:white;}}
-    .stButton > button:hover {{background:#ff2b22; color:white;}}
     .stDataFrame {{border:1px solid {BORDER}; border-radius:8px; overflow:hidden;}}
     </style>
     """,
